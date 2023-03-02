@@ -14,19 +14,28 @@ class ScheduleManager {
 	 * called at regular interval with the appropriate parameters.
 	 */
 	public static function manage( HeatingManagerImpl $heatingManager, string $threshold ): void {
-		$temperature = floatval( self::stringFromURL( "http://probe.home:9999/temp", 4 ) );
+		( new self( $heatingManager ) )->doManage( $threshold );
+	}
+
+	public function __construct(
+		private readonly HeatingManagerImpl $heatingManager
+	) {
+	}
+
+	private function doManage( string $threshold ): void {
+		$temperature = floatval( $this->stringFromURL( "http://probe.home:9999/temp", 4 ) );
 
 		$now = gettimeofday( true );
-		if ( $now > self::startHour() && $now < self::endHour() ) {
-			$heatingManager->manageHeating( $temperature, floatval( $threshold ) );
+		if ( $now > $this->startHour() && $now < $this->endHour() ) {
+			$this->heatingManager->manageHeating( $temperature, floatval( $threshold ) );
 		}
 	}
 
-	private static function endHour(): float {
-		return floatval( self::stringFromURL( "http://timer.home:9990/end", 5 ) );
+	private function endHour(): float {
+		return floatval( $this->stringFromURL( "http://timer.home:9990/end", 5 ) );
 	}
 
-	private static function stringFromURL( string $url, int $length ) {
+	private function stringFromURL( string $url, int $length ) {
 		$curl = curl_init();
 
 		curl_setopt( $curl, CURLOPT_URL, $url );
@@ -39,7 +48,7 @@ class ScheduleManager {
 		return substr( $output, 0, $length );
 	}
 
-	private static function startHour(): float {
-		return floatval( self::stringFromURL( "http://timer.home:9990/start", 5 ) );
+	private function startHour(): float {
+		return floatval( $this->stringFromURL( "http://timer.home:9990/start", 5 ) );
 	}
 }
