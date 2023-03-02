@@ -18,12 +18,13 @@ class ScheduleManager {
 	}
 
 	public function __construct(
-		private readonly HeatingManagerImpl $heatingManager
+		private readonly HeatingManagerImpl $heatingManager,
+		private readonly UrlStringReader $urlStringReader = new CurlUrlStringReader() // TODO replace with Guzzle?
 	) {
 	}
 
 	private function doManage( string $threshold ): void {
-		$temperature = floatval( $this->stringFromURL( "http://probe.home:9999/temp", 4 ) );
+		$temperature = floatval( $this->urlStringReader->readStringFromUrl( "http://probe.home:9999/temp", 4 ) );
 
 		$now = gettimeofday( true );
 		if ( $now > $this->startHour() && $now < $this->endHour() ) {
@@ -32,23 +33,10 @@ class ScheduleManager {
 	}
 
 	private function endHour(): float {
-		return floatval( $this->stringFromURL( "http://timer.home:9990/end", 5 ) );
-	}
-
-	private function stringFromURL( string $url, int $length ) {
-		$curl = curl_init();
-
-		curl_setopt( $curl, CURLOPT_URL, $url );
-		curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
-
-		$output = curl_exec( $curl );
-
-		curl_close( $curl );
-
-		return substr( $output, 0, $length );
+		return floatval( $this->urlStringReader->readStringFromUrl( "http://timer.home:9990/end", 5 ) );
 	}
 
 	private function startHour(): float {
-		return floatval( $this->stringFromURL( "http://timer.home:9990/start", 5 ) );
+		return floatval( $this->urlStringReader->readStringFromUrl( "http://timer.home:9990/start", 5 ) );
 	}
 }
