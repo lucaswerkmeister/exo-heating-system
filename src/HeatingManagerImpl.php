@@ -1,10 +1,10 @@
 <?php
 
 class HeatingManagerImpl {
-	public function manageHeating( string $t, string $threshold, bool $active ): void {
+	public function manageHeating( string $t, string $threshold ): void {
 		$dt = floatval( $t );
 		$dThreshold = floatval( $threshold );
-		if ( $dt < $dThreshold && $active ) {
+		if ( $dt < $dThreshold ) {
 			try {
 				if ( !( $s = socket_create( AF_INET, SOCK_STREAM, 0 ) ) ) {
 					die( 'could not create socket' );
@@ -18,7 +18,7 @@ class HeatingManagerImpl {
 			} catch ( Exception $e ) {
 				echo 'Caught exception: ', $e->getMessage(), "\n";
 			}
-		} elseif ( $dt > $dThreshold && $active ) {
+		} elseif ( $dt > $dThreshold ) {
 			try {
 				if ( !( $s = socket_create( AF_INET, SOCK_STREAM, 0 ) ) ) {
 					die( 'could not create socket' );
