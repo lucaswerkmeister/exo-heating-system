@@ -13,12 +13,12 @@ class ScheduleManager {
 	 * This method is the entry point into the code. You can assume that it is
 	 * called at regular interval with the appropriate parameters.
 	 */
-	public static function manage( HeatingManagerImpl $hM, string $threshold ): void {
-		$t = floatval( self::stringFromURL( "http://probe.home:9999/temp", 4 ) );
+	public static function manage( HeatingManagerImpl $heatingManager, string $threshold ): void {
+		$temperature = floatval( self::stringFromURL( "http://probe.home:9999/temp", 4 ) );
 
 		$now = gettimeofday( true );
 		if ( $now > self::startHour() && $now < self::endHour() ) {
-			$hM->manageHeating( $t, floatval( $threshold ) );
+			$heatingManager->manageHeating( $temperature, floatval( $threshold ) );
 		}
 	}
 
@@ -26,17 +26,17 @@ class ScheduleManager {
 		return floatval( self::stringFromURL( "http://timer.home:9990/end", 5 ) );
 	}
 
-	private static function stringFromURL( string $urlString, int $s ) {
-		$c = curl_init();
+	private static function stringFromURL( string $url, int $length ) {
+		$curl = curl_init();
 
-		curl_setopt( $c, CURLOPT_URL, $urlString );
-		curl_setopt( $c, CURLOPT_RETURNTRANSFER, true );
+		curl_setopt( $curl, CURLOPT_URL, $url );
+		curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
 
-		$o = curl_exec( $c );
+		$output = curl_exec( $curl );
 
-		curl_close( $c );
+		curl_close( $curl );
 
-		return substr( $o, 0, $s );
+		return substr( $output, 0, $length );
 	}
 
 	private static function startHour(): float {
