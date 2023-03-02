@@ -24,11 +24,9 @@ class ScheduleManager {
 	}
 
 	private function doManage( string $threshold ): void {
-		$temperature = floatval( $this->urlStringReader->readStringFromUrl( "http://probe.home:9999/temp", 4 ) );
-
 		$now = gettimeofday( true );
 		if ( $now > $this->startHour() && $now < $this->endHour() ) {
-			$this->heatingManager->manageHeating( $temperature, floatval( $threshold ) );
+			$this->heatingManager->manageHeating( floatval( $threshold ) );
 		}
 	}
 
