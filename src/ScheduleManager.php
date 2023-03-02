@@ -20,9 +20,6 @@ class ScheduleManager {
 		if ( $now > self::startHour() && $now < self::endHour() ) {
 			$hM->manageHeating( $t, $threshold, true );
 		}
-		if ( $now < self::startHour() || $now > self::endHour() ) {
-			$hM->manageHeating( $t, $threshold, false );
-		}
 	}
 
 	private static function endHour(): float {
