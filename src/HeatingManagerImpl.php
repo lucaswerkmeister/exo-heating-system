@@ -1,22 +1,17 @@
 <?php
 
 class HeatingManagerImpl {
-	public function manageHeating( float $temperature, float $threshold ): void {
-		if ( $temperature < $threshold ) {
-			$this->sendToSocket( 'on' );
-		} elseif ( $temperature > $threshold ) {
-			$this->sendToSocket( 'off' );
-		}
+
+	public function __construct(
+		private readonly HeaterController $heaterController = new SocketHeaterController()
+	) {
 	}
 
-	private function sendToSocket( string $message ): void {
-		if ( !( $socket = socket_create( AF_INET, SOCK_STREAM, 0 ) ) ) {
-			throw new RuntimeException( 'could not create socket' );
+	public function manageHeating( float $temperature, float $threshold ): void {
+		if ( $temperature < $threshold ) {
+			$this->heaterController->turnOn();
+		} elseif ( $temperature > $threshold ) {
+			$this->heaterController->turnOff();
 		}
-		if ( !socket_connect( $socket, 'heater.home', 9999 ) ) {
-			throw new RuntimeException( 'could not connect!' );
-		}
-		socket_send( $socket, $message, strlen( $message ), 0 );
-		socket_close( $socket );
 	}
 }
