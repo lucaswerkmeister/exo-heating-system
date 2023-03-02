@@ -24,8 +24,8 @@ class ScheduleManager {
 	}
 
 	private function doManage( string $threshold ): void {
-		$now = gettimeofday( true );
-		if ( $now > $this->startHour() && $now < $this->endHour() ) {
+		$currentHour = intval( date( 'H' ) );
+		if ( $currentHour > $this->startHour() && $currentHour < $this->endHour() ) {
 			$this->heatingManager->manageHeating( floatval( $threshold ) );
 		}
 	}
