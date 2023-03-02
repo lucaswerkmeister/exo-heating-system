@@ -14,11 +14,11 @@ class ScheduleManager {
 	 * called at regular interval with the appropriate parameters.
 	 */
 	public static function manage( HeatingManagerImpl $hM, string $threshold ): void {
-		$t = self::stringFromURL( "http://probe.home:9999/temp", 4 );
+		$t = floatval( self::stringFromURL( "http://probe.home:9999/temp", 4 ) );
 
 		$now = gettimeofday( true );
 		if ( $now > self::startHour() && $now < self::endHour() ) {
-			$hM->manageHeating( $t, $threshold );
+			$hM->manageHeating( $t, floatval( $threshold ) );
 		}
 	}
 
